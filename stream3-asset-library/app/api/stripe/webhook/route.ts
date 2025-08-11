@@ -6,8 +6,11 @@ export async function POST(req: Request){
   const sig = req.headers.get('stripe-signature')!
   const body = await req.text()
   let event
-  try{ event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!) }
-  catch(e:any){ return new Response(`Webhook Error: ${e.message}`, { status: 400 }) }
+  try{
+    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
+  }catch(e:any){
+    return new Response(`Webhook Error: ${e.message}`, { status: 400 })
+  }
   if(event.type==='checkout.session.completed'){
     const s = event.data.object as Stripe.Checkout.Session
     const email = s.customer_details?.email || ''
